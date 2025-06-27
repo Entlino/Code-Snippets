@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Snippet Library</title>
+    <style>
+      /* Minimal basic style, you can move this to your style.css */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f5f7fa;
+        color: #333;
+      }
+      nav {
+        background: #007bff;
+        padding: 10px 20px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      nav input[type="text"] {
+        flex-grow: 1;
+        padding: 6px 10px;
+        border-radius: 4px;
+        border: none;
+      }
+      nav button {
+        background: #0056b3;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      nav button:hover {
+        background: #004494;
+      }
+      main {
+        max-width: 900px;
+        margin: 20px auto;
+        padding: 0 20px;
+      }
+      form {
+        margin-bottom: 30px;
+        background: white;
+        padding: 20px;
+        border-radius: 6px;
+        box-shadow: 0 0 8px rgb(0 0 0 / 0.1);
+      }
+      form h2 {
+        margin-top: 0;
+      }
+      textarea {
+        width: 100%;
+        min-height: 120px;
+        padding: 10px;
+        font-family: monospace;
+        font-size: 14px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        resize: vertical;
+        box-sizing: border-box;
+        margin-bottom: 10px;
+      }
+      button[type="submit"] {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-weight: bold;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      button[type="submit"]:hover {
+        background: #0056b3;
+      }
+      #responseMsg {
+        margin-top: 10px;
+        font-style: italic;
+        color: #333;
+      }
+      #searchResults,
+      #snippetsList {
+        background: white;
+        padding: 20px;
+        border-radius: 6px;
+        box-shadow: 0 0 8px rgb(0 0 0 / 0.1);
+        margin-bottom: 30px;
+      }
+      #searchResults div,
+      #allSnippetsList div {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin: 10px 0;
+        white-space: pre-wrap;
+        background: #f9f9f9;
+        border-radius: 4px;
+      }
+      #searchResults div {
+        background: #eef;
+        border-color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <input type="text" id="searchInput" placeholder="Search snippets..." />
+      <button id="searchBtn">Search</button>
+      <button id="showAllBtn">Show All</button>
+    </nav>
+
+    <main>
+      <form id="snippetForm">
+        <h2>Add a New Snippet</h2>
+        <textarea
+          id="codeInput"
+          placeholder="Paste your code snippet here..."
+        ></textarea>
+        <br />
+        <button type="submit">Submit Snippet</button>
+        <div id="responseMsg"></div>
+      </form>
+
+      <div id="searchResults" style="display: none">
+        <h2>Search Results</h2>
+        <div id="searchResultsList"></div>
+      </div>
+
+      <div id="snippetsList" style="display: none">
+        <h2>All Snippets</h2>
+        <div id="allSnippetsList"></div>
+      </div>
+    </main>
+
+    <script>
+      const form = document.getElementById("snippetForm");
+      const codeInput = document.getElementById("codeInput");
+      const responseMsg = document.getElementById("responseMsg");
+
+      const searchBtn = document.getElementById("searchBtn");
+      const searchInput = document.getElementById("searchInput");
+      const searchResults = document.getElementById("searchResults");
+      const searchResultsList = document.getElementById("searchResultsList");
+
+      const showAllBtn = document.getElementById("showAllBtn");
+      const snippetsList = document.getElementById("snippetsList");
+      const allSnippetsList = document.getElementById("allSnippetsList");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const code = codeInput.value.trim();
+        if (!code) {
+          responseMsg.textContent = "Please enter a code snippet.";
+          return;
+        }
+
+        try {
+          const response = await fetch("/add_snippet", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code }),
+          });
+
+          const result = await response.json();
+
+          if (response.ok) {
+            responseMsg.textContent = `Snippet saved with ID: ${result.id}`;
+            codeInput.value = "";
+          } else {
+            responseMsg.textContent = `Error: ${
+              result.error || "Unknown error"
+            }`;
+          }
+        } catch (err) {
+          responseMsg.textContent = "Failed to submit snippet.";
+          console.error(err);
+        }
+      });
+
+      searchBtn.addEventListener("click", async () => {
+        const q = searchInput.value.trim();
+        if (!q) {
+          searchResults.textContent = "Please enter a search term.";
+          return;
+        }
+
+        snippetsList.style.display = "none";
+        searchResults.style.display = "block";
+        searchResultsList.textContent = "Searching...";
+
+        try {
+          const res = await fetch(`/search?q=${encodeURIComponent(q)}`);
+          const snippets = await res.json();
+
+          if (snippets.length === 0) {
+            searchResultsList.textContent = "No snippets found.";
+            return;
+          }
+
+          searchResultsList.innerHTML = "";
+          snippets.forEach((snip) => {
+            const snippetDiv = document.createElement("div");
+            snippetDiv.textContent = `ID: ${snip.id}\nTags: ${
+              snip.tags || "(none)"
+            }\nCode:\n${snip.code}`;
+            searchResultsList.appendChild(snippetDiv);
+          });
+        } catch (err) {
+          searchResultsList.textContent = "Search failed.";
+          console.error(err);
+        }
+      });
+
+      showAllBtn.addEventListener("click", async () => {
+        searchResults.style.display = "none";
+        snippetsList.style.display = "block";
+
+        try {
+          const res = await fetch("/snippets");
+          const snippets = await res.json();
+
+          if (snippets.length === 0) {
+            allSnippetsList.textContent = "No snippets stored yet.";
+            return;
+          }
+
+          allSnippetsList.innerHTML = "";
+          snippets.forEach((snip) => {
+            const snippetDiv = document.createElement("div");
+            snippetDiv.textContent = `ID: ${snip.id}\nTags: ${
+              snip.tags || "(none)"
+            }\nCode:\n${snip.code}`;
+            allSnippetsList.appendChild(snippetDiv);
+          });
+        } catch (err) {
+          allSnippetsList.textContent = "Failed to load snippets.";
+          console.error(err);
+        }
+      });
+    </script>
+  </body>
+</html>
