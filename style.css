@@ -30,6 +30,11 @@ nav input[type="text"] {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
+nav input[type="text"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.3);
+}
+
 nav button {
   padding: 10px 22px;
   background: #4f8cff;
@@ -41,8 +46,14 @@ nav button {
   font-size: 1rem;
   transition: background 0.2s;
 }
+
 nav button:hover {
   background: #3456b3;
+}
+
+nav button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
 }
 
 main {
@@ -64,9 +75,16 @@ form {
   align-items: stretch;
 }
 
+form h2 {
+  margin: 0 0 10px 0;
+  color: #22223b;
+  font-size: 1.5em;
+  font-weight: 600;
+}
+
 textarea {
   width: 100%;
-  font-family: monospace;
+  font-family: "Fira Mono", monospace;
   font-size: 1rem;
   padding: 14px;
   border-radius: 8px;
@@ -79,7 +97,13 @@ textarea {
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
   background: #f8fafc;
   margin: 0;
-  box-sizing: border-box; /* Diese Zeile hinzufügen */
+  box-sizing: border-box;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #4f8cff;
+  box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.1);
 }
 
 button[type="submit"] {
@@ -95,22 +119,49 @@ button[type="submit"] {
   align-self: flex-end;
   transition: background 0.2s;
 }
+
 button[type="submit"]:hover {
   background: #4f8cff;
 }
 
+button[type="submit"]:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* Message Styling */
+#responseMsg {
+  padding: 10px;
+  border-radius: 6px;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.success-msg {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.error-msg {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 8px;
   background: #f5f7fa;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #e0e7ff;
   border-radius: 4px;
 }
 
-/* Fügen Sie diese CSS-Regeln zu Ihrer bestehenden CSS-Datei hinzu: */
-
-/* Einheitliche Breite für alle Container */
+/* Container Styling */
 #snippetsList,
 #searchResults {
   background: #fff;
@@ -118,14 +169,14 @@ button[type="submit"]:hover {
   box-shadow: 0 4px 24px rgba(34, 34, 59, 0.1);
   padding: 32px;
   margin: 48px auto 36px auto;
-  max-width: 600px; /* Gleiche Breite wie das Formular */
-  max-height: none; /* Entfernt die Höhenbeschränkung */
-  overflow-y: visible; /* Entfernt das Scrolling */
-  white-space: normal; /* Normaler Textumbruch */
-  font-family: "Inter", Arial, sans-serif; /* Gleiche Schriftart wie der Rest */
+  max-width: 600px;
+  max-height: none;
+  overflow-y: visible;
+  white-space: normal;
+  font-family: "Inter", Arial, sans-serif;
 }
 
-/* Verbesserte Snippet-Item Cards */
+/* Snippet Item Cards */
 .snippet-item {
   background: #fff;
   border-radius: 12px;
@@ -146,7 +197,7 @@ button[type="submit"]:hover {
   margin-bottom: 0;
 }
 
-/* Header-Bereich für Metadaten */
+/* Header Area for Metadata */
 .snippet-header {
   margin-bottom: 16px;
   padding-bottom: 12px;
@@ -155,7 +206,7 @@ button[type="submit"]:hover {
 
 .snippet-meta {
   color: #666;
-  font-size: 0.9em;
+  font-size: 0.85em;
   font-weight: 600;
   margin-bottom: 8px;
 }
@@ -163,18 +214,19 @@ button[type="submit"]:hover {
 .snippet-tags {
   color: #4f8cff;
   font-size: 0.85em;
-  font-style: italic;
+  font-weight: 500;
   margin-bottom: 8px;
 }
 
 .snippet-description {
   color: #444;
   font-size: 0.9em;
-  line-height: 1.4;
+  line-height: 1.5;
   margin-bottom: 8px;
+  font-style: italic;
 }
 
-/* Code-Container mit Copy-Button */
+/* Code Container with Copy Button */
 .code-container {
   position: relative;
 }
@@ -189,6 +241,7 @@ button[type="submit"]:hover {
   overflow-x: auto;
   margin: 0;
   position: relative;
+  line-height: 1.4;
 }
 
 .snippet-item pre code {
@@ -202,7 +255,7 @@ button[type="submit"]:hover {
   border: none;
 }
 
-/* Copy-Button Styling */
+/* Copy Button Styling */
 .copy-btn {
   position: absolute;
   top: 8px;
@@ -211,19 +264,21 @@ button[type="submit"]:hover {
   color: #f8fafc;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 4px;
-  padding: 4px 8px;
+  padding: 6px 10px;
   font-size: 0.75em;
   cursor: pointer;
   transition: all 0.2s;
   backdrop-filter: blur(4px);
+  font-weight: 500;
 }
 
 .copy-btn:hover {
   background: rgba(255, 255, 255, 0.2);
   border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
 }
 
-/* Überschriften in den Containern */
+/* Container Headers */
 #snippetsList h2,
 #searchResults h2 {
   margin-top: 0;
@@ -231,4 +286,67 @@ button[type="submit"]:hover {
   color: #22223b;
   font-size: 1.5em;
   font-weight: 600;
+}
+
+/* Loading and No Results States */
+.loading,
+.no-results {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+  font-style: italic;
+}
+
+.loading {
+  color: #4f8cff;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  nav {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  nav input[type="text"] {
+    margin-right: 0;
+    margin-bottom: 8px;
+  }
+
+  main {
+    padding: 0 16px;
+    margin: 16px auto;
+  }
+
+  form,
+  #snippetsList,
+  #searchResults {
+    padding: 20px;
+    margin: 24px auto 20px auto;
+  }
+
+  .snippet-item {
+    padding: 16px;
+  }
+
+  .snippet-item pre {
+    font-size: 0.8em;
+  }
+}
+
+/* Animation for smooth transitions */
+.snippet-item {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

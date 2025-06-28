@@ -12,7 +12,6 @@
       <button id="searchBtn">Search</button>
       <button id="showAllBtn">Show All</button>
     </nav>
-
     <main>
       <form id="snippetForm">
         <h2>Add a New Snippet</h2>
@@ -23,199 +22,192 @@
         <button type="submit">Submit Snippet</button>
         <div id="responseMsg"></div>
       </form>
-
       <div id="searchResults" style="display: none">
         <h2>Search Results</h2>
         <div id="searchResultsList"></div>
       </div>
-
       <div id="snippetsList" style="display: none">
         <h2>All Snippets</h2>
         <div id="allSnippetsList"></div>
       </div>
     </main>
-
     <script>
+      // DOM Elements
       const form = document.getElementById("snippetForm");
       const codeInput = document.getElementById("codeInput");
       const responseMsg = document.getElementById("responseMsg");
-
       const searchBtn = document.getElementById("searchBtn");
       const searchInput = document.querySelector('nav input[type="text"]');
       const searchResults = document.getElementById("searchResults");
       const searchResultsList = document.getElementById("searchResultsList");
-
       const showAllBtn = document.getElementById("showAllBtn");
       const snippetsList = document.getElementById("snippetsList");
       const allSnippetsList = document.getElementById("allSnippetsList");
 
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
+      // Utility Functions
+      function showMessage(message, isError = false) {
+        responseMsg.textContent = message;
+        responseMsg.className = isError ? "error-msg" : "success-msg";
+        setTimeout(() => {
+          responseMsg.textContent = "";
+          responseMsg.className = "";
+        }, 3000);
+      }
 
-        const code = codeInput.value.trim();
-        if (!code) {
-          responseMsg.textContent = "Please enter a code snippet.";
+      async function handleApiCall(apiCall, errorMsg) {
+        try {
+          return await apiCall();
+        } catch (err) {
+          console.error(errorMsg, err);
+          showMessage(errorMsg, true);
+          return null;
+        }
+      }
+
+      function createSnippetElement(snip) {
+        const snippetDiv = document.createElement("div");
+        snippetDiv.className = "snippet-item";
+
+        const copyBtn = document.createElement("button");
+        copyBtn.className = "copy-btn";
+        copyBtn.innerHTML = "📋 Copy";
+        copyBtn.onclick = () => {
+          navigator.clipboard
+            .writeText(snip.code)
+            .then(() => {
+              copyBtn.innerHTML = "✓ Copied!";
+              setTimeout(() => (copyBtn.innerHTML = "📋 Copy"), 2000);
+            })
+            .catch(() => {
+              showMessage("Failed to copy to clipboard", true);
+            });
+        };
+
+        snippetDiv.innerHTML = `
+          <div class="snippet-header">
+            <div class="snippet-meta">ID: ${snip.id} • ${new Date(
+          snip.created_at
+        ).toLocaleDateString()}</div>
+            ${
+              snip.tags
+                ? '<div class="snippet-tags">Tags: ' + snip.tags + "</div>"
+                : ""
+            }
+            ${
+              snip.description
+                ? '<div class="snippet-description">Description: ' +
+                  snip.description +
+                  "</div>"
+                : ""
+            }
+          </div>
+          <div class="code-container">
+            <pre><code>${snip.code
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;")}</code></pre>
+          </div>
+        `;
+
+        const codeContainer = snippetDiv.querySelector(".code-container");
+        codeContainer.appendChild(copyBtn);
+
+        return snippetDiv;
+      }
+
+      function displaySnippets(snippets, container) {
+        if (snippets.length === 0) {
+          container.innerHTML =
+            '<div class="no-results">No snippets found.</div>';
           return;
         }
 
-        try {
+        container.innerHTML = "";
+        snippets.forEach((snip) => {
+          container.appendChild(createSnippetElement(snip));
+        });
+      }
+
+      // Event Listeners
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const code = codeInput.value.trim();
+
+        if (!code) {
+          showMessage("Please enter a code snippet.", true);
+          return;
+        }
+
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = "Saving...";
+        submitBtn.disabled = true;
+
+        const result = await handleApiCall(async () => {
           const response = await fetch("/add_snippet", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ code }),
           });
 
-          const result = await response.json();
-
-          if (response.ok) {
-            codeInput.value = "";
-            responseMsg.textContent = ""; // Keine Rückmeldung anzeigen
-          } else {
-            responseMsg.textContent = `Error: ${
-              result.error || "Unknown error"
-            }`;
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Unknown error");
           }
-        } catch (err) {
-          responseMsg.textContent = "Failed to submit snippet.";
-          console.error(err);
+
+          return response.json();
+        }, "Failed to submit snippet.");
+
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+
+        if (result) {
+          codeInput.value = "";
+          showMessage("Snippet saved successfully!");
+          // Auto resize textarea
+          codeInput.style.height = "auto";
         }
       });
-
-      // Ersetzen Sie die searchBtn Event Listener Funktion durch diese verbesserte Version:
 
       searchBtn.addEventListener("click", async () => {
         const q = searchInput.value.trim();
         if (!q) {
-          searchResults.textContent = "Please enter a search term.";
+          showMessage("Please enter a search term.", true);
           return;
         }
 
         snippetsList.style.display = "none";
         searchResults.style.display = "block";
-        searchResultsList.textContent = "Searching...";
+        searchResultsList.innerHTML = '<div class="loading">Searching...</div>';
 
-        try {
+        const snippets = await handleApiCall(async () => {
           const res = await fetch(`/search?q=${encodeURIComponent(q)}`);
-          const snippets = await res.json();
+          if (!res.ok) throw new Error("Search failed");
+          return res.json();
+        }, "Search failed.");
 
-          if (snippets.length === 0) {
-            searchResultsList.textContent = "No snippets found.";
-            return;
-          }
-
-          searchResultsList.innerHTML = "";
-          snippets.forEach((snip) => {
-            const snippetDiv = document.createElement("div");
-            snippetDiv.className = "snippet-item";
-
-            // Erstelle Copy-Button
-            const copyBtn = document.createElement("button");
-            copyBtn.className = "copy-btn";
-            copyBtn.innerHTML = "📋 Copy";
-            copyBtn.onclick = () => {
-              navigator.clipboard.writeText(snip.code);
-              copyBtn.innerHTML = "✓ Copied!";
-              setTimeout(() => (copyBtn.innerHTML = "📋 Copy"), 2000);
-            };
-
-            snippetDiv.innerHTML = `
-        <div class="snippet-header">
-          <div class="snippet-meta">ID: ${snip.id}</div>
-          ${
-            snip.tags
-              ? '<div class="snippet-tags">Tags: ' + snip.tags + "</div>"
-              : ""
-          }
-          ${
-            snip.description
-              ? '<div class="snippet-description">Beschreibung: ' +
-                snip.description +
-                "</div>"
-              : ""
-          }
-        </div>
-        <div class="code-container">
-          <pre><code>${snip.code
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")}</code></pre>
-        </div>
-      `;
-
-            // Copy-Button hinzufügen
-            const codeContainer = snippetDiv.querySelector(".code-container");
-            codeContainer.appendChild(copyBtn);
-
-            searchResultsList.appendChild(snippetDiv);
-          });
-        } catch (err) {
-          searchResultsList.textContent = "Search failed.";
-          console.error(err);
+        if (snippets) {
+          displaySnippets(snippets, searchResultsList);
         }
       });
 
       showAllBtn.addEventListener("click", async () => {
         searchResults.style.display = "none";
         snippetsList.style.display = "block";
+        allSnippetsList.innerHTML =
+          '<div class="loading">Loading snippets...</div>';
 
-        try {
+        const snippets = await handleApiCall(async () => {
           const res = await fetch("/snippets");
-          const snippets = await res.json();
+          if (!res.ok) throw new Error("Failed to load snippets");
+          return res.json();
+        }, "Failed to load snippets.");
 
-          if (snippets.length === 0) {
-            allSnippetsList.textContent = "No snippets stored yet.";
-            return;
-          }
-
-          allSnippetsList.innerHTML = "";
-          snippets.forEach((snip) => {
-            const snippetDiv = document.createElement("div");
-            snippetDiv.className = "snippet-item";
-
-            // Erstelle Copy-Button
-            const copyBtn = document.createElement("button");
-            copyBtn.className = "copy-btn";
-            copyBtn.innerHTML = "📋 Copy";
-            copyBtn.onclick = () => {
-              navigator.clipboard.writeText(snip.code);
-              copyBtn.innerHTML = "✓ Copied!";
-              setTimeout(() => (copyBtn.innerHTML = "📋 Copy"), 2000);
-            };
-
-            snippetDiv.innerHTML = `
-        <div class="snippet-header">
-          <div class="snippet-meta">ID: ${snip.id}</div>
-          ${
-            snip.tags
-              ? '<div class="snippet-tags">Tags: ' + snip.tags + "</div>"
-              : ""
-          }
-          ${
-            snip.description
-              ? '<div class="snippet-description">Beschreibung: ' +
-                snip.description +
-                "</div>"
-              : ""
-          }
-        </div>
-        <div class="code-container">
-          <pre><code>${snip.code
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")}</code></pre>
-        </div>
-      `;
-
-            // Copy-Button hinzufügen
-            const codeContainer = snippetDiv.querySelector(".code-container");
-            codeContainer.appendChild(copyBtn);
-
-            allSnippetsList.appendChild(snippetDiv);
-          });
-        } catch (err) {
-          allSnippetsList.textContent = "Failed to load snippets.";
-          console.error(err);
+        if (snippets) {
+          displaySnippets(snippets, allSnippetsList);
         }
       });
 
+      // Auto-resize textarea
       document.querySelectorAll("textarea").forEach((textarea) => {
         textarea.addEventListener("input", function () {
           this.style.height = "auto";
@@ -223,16 +215,20 @@
         });
       });
 
-      const searchButton = document.querySelector("nav button");
+      // Enter key search
+      searchInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          searchBtn.click();
+        }
+      });
 
-      if (searchInput && searchButton) {
-        searchInput.addEventListener("keydown", function (e) {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            searchButton.click();
-          }
-        });
-      }
+      // Clear search when input is empty
+      searchInput.addEventListener("input", function () {
+        if (!this.value.trim()) {
+          searchResults.style.display = "none";
+        }
+      });
     </script>
   </body>
 </html>

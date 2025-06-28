@@ -3,14 +3,38 @@ import json
 import re
 from typing import Dict
 
+def detect_code_type_fallback(code: str) -> Dict[str, str]:
+    """Einfache Fallback-Analyse für Code-Snippets."""
+    # Sehr einfache Heuristik für Sprache
+    languages = {
+        'python': ['def ', 'import ', 'print(', 'self', 'lambda'],
+        'javascript': ['function ', 'console.log', 'var ', 'let ', 'const '],
+        'java': ['public class', 'System.out.println', 'void main'],
+        'html': ['<html', '<div', '<body', '<head'],
+        'css': ['{', '}', 'color:', 'font-size:'],
+        'sql': ['SELECT ', 'INSERT ', 'UPDATE ', 'DELETE ', 'FROM '],
+        'bash': ['#!/bin/bash', 'echo ', 'fi', 'done'],
+        'php': ['<?php', 'echo ', '$'],
+        'go': ['package main', 'func main', 'import ('],
+        'rust': ['fn main()', 'let mut', 'println!']
+    }
+    detected = []
+    code_lower = code.lower()
+    for lang, patterns in languages.items():
+        if any(pat.lower() in code_lower for pat in patterns):
+            detected.append(lang)
+            break
+    tags = detected if detected else ['code', 'snippet']
+    return {
+        'tags': ','.join(tags),
+        'description': 'Ein Code-Snippet, das automatisch erkannt wurde.'
+    }
+
 def analyze_code_snippet(code: str) -> Dict[str, str]:
     """Analysiert Code-Snippet mit CodeLama und gibt Tags + Beschreibung zurück"""
     
     # Fallback falls AI nicht verfügbar
-    fallback = {
-        'tags': 'code,snippet',
-        'description': 'Code-Snippet'
-    }
+    fallback = detect_code_type_fallback(code)
     
     try:
         # Ollama API aufrufen - Einfacherer Prompt der besser funktioniert
