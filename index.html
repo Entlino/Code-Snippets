@@ -81,6 +81,8 @@
         }
       });
 
+      // Ersetzen Sie die searchBtn Event Listener Funktion durch diese verbesserte Version:
+
       searchBtn.addEventListener("click", async () => {
         const q = searchInput.value.trim();
         if (!q) {
@@ -105,21 +107,44 @@
           snippets.forEach((snip) => {
             const snippetDiv = document.createElement("div");
             snippetDiv.className = "snippet-item";
+
+            // Erstelle Copy-Button
+            const copyBtn = document.createElement("button");
+            copyBtn.className = "copy-btn";
+            copyBtn.innerHTML = "📋 Copy";
+            copyBtn.onclick = () => {
+              navigator.clipboard.writeText(snip.code);
+              copyBtn.innerHTML = "✓ Copied!";
+              setTimeout(() => (copyBtn.innerHTML = "📋 Copy"), 2000);
+            };
+
             snippetDiv.innerHTML = `
-  <div class="snippet-meta">ID: ${snip.id} ${
-              snip.tags
-                ? '| Tags: <span class="snippet-tags">' + snip.tags + "</span>"
-                : ""
-            }</div>
-  ${
-    snip.description
-      ? '<div class="snippet-meta">Description: ' + snip.description + "</div>"
-      : ""
-  }
-  <pre><code>${snip.code
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")}</code></pre>
-`;
+        <div class="snippet-header">
+          <div class="snippet-meta">ID: ${snip.id}</div>
+          ${
+            snip.tags
+              ? '<div class="snippet-tags">Tags: ' + snip.tags + "</div>"
+              : ""
+          }
+          ${
+            snip.description
+              ? '<div class="snippet-description">Beschreibung: ' +
+                snip.description +
+                "</div>"
+              : ""
+          }
+        </div>
+        <div class="code-container">
+          <pre><code>${snip.code
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")}</code></pre>
+        </div>
+      `;
+
+            // Copy-Button hinzufügen
+            const codeContainer = snippetDiv.querySelector(".code-container");
+            codeContainer.appendChild(copyBtn);
+
             searchResultsList.appendChild(snippetDiv);
           });
         } catch (err) {
@@ -144,11 +169,45 @@
           allSnippetsList.innerHTML = "";
           snippets.forEach((snip) => {
             const snippetDiv = document.createElement("div");
-            snippetDiv.textContent = `ID: ${snip.id}
-            Tags: ${snip.tags || "(none)"}
-            Beschreibung: ${snip.description || "(none)"}
-            Code:
-            ${snip.code}`;
+            snippetDiv.className = "snippet-item";
+
+            // Erstelle Copy-Button
+            const copyBtn = document.createElement("button");
+            copyBtn.className = "copy-btn";
+            copyBtn.innerHTML = "📋 Copy";
+            copyBtn.onclick = () => {
+              navigator.clipboard.writeText(snip.code);
+              copyBtn.innerHTML = "✓ Copied!";
+              setTimeout(() => (copyBtn.innerHTML = "📋 Copy"), 2000);
+            };
+
+            snippetDiv.innerHTML = `
+        <div class="snippet-header">
+          <div class="snippet-meta">ID: ${snip.id}</div>
+          ${
+            snip.tags
+              ? '<div class="snippet-tags">Tags: ' + snip.tags + "</div>"
+              : ""
+          }
+          ${
+            snip.description
+              ? '<div class="snippet-description">Beschreibung: ' +
+                snip.description +
+                "</div>"
+              : ""
+          }
+        </div>
+        <div class="code-container">
+          <pre><code>${snip.code
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")}</code></pre>
+        </div>
+      `;
+
+            // Copy-Button hinzufügen
+            const codeContainer = snippetDiv.querySelector(".code-container");
+            codeContainer.appendChild(copyBtn);
+
             allSnippetsList.appendChild(snippetDiv);
           });
         } catch (err) {
