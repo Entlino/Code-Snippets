@@ -38,7 +38,7 @@ Description: Short sentence describing what this code does.
         response = requests.post(
             "http://localhost:11434/api/generate",
             json=payload,
-            timeout=30
+            timeout=300
         )
         
         if response.status_code == 200:
