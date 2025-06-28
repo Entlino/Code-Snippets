@@ -1,98 +1,172 @@
 body {
-  font-family: Arial, sans-serif;
+  font-family: "Inter", Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background: #f5f7fa;
-  color: #333;
+  background: linear-gradient(135deg, #e0e7ff 0%, #f5f7fa 100%);
+  color: #222;
+  min-height: 100vh;
 }
 
 nav {
   display: flex;
   align-items: center;
-  background: #007bff;
-  padding: 10px 20px;
-  color: white;
+  background: #22223b;
+  padding: 16px 32px;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(34, 34, 59, 0.08);
+  gap: 16px;
 }
 
 nav input[type="text"] {
   flex-grow: 1;
-  padding: 8px;
+  padding: 10px 14px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   margin-right: 10px;
+  font-size: 1rem;
+  background: #f5f7fa;
+  color: #222;
+  transition: box-shadow 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 nav button {
-  padding: 8px 15px;
-  background: white;
-  color: #007bff;
+  padding: 10px 22px;
+  background: #4f8cff;
+  color: #fff;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+nav button:hover {
+  background: #3456b3;
 }
 
 main {
-  max-width: 800px;
-  margin: 20px auto;
-  padding: 0 20px;
+  max-width: 900px;
+  margin: 32px auto;
+  padding: 0 24px;
 }
 
 form {
-  background: white;
-  padding: 15px;
-  border-radius: 6px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px;
+  background: #fff;
+  padding: 32px 32px 24px 32px;
+  border-radius: 14px;
+  box-shadow: 0 4px 24px rgba(34, 34, 59, 0.1);
+  margin: 48px auto 36px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 600px;
+  align-items: stretch;
 }
 
 textarea {
   width: 100%;
   font-family: monospace;
   font-size: 1rem;
-  padding: 10px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid #e0e7ff;
   resize: vertical;
   min-height: 120px;
+  max-height: 300px;
+  overflow-y: auto;
+  transition: box-shadow 0.2s, border-color 0.2s;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+  background: #f8fafc;
+  margin: 0;
 }
 
 button[type="submit"] {
-  background: #007bff;
-  color: white;
-  padding: 10px 20px;
+  background: #22223b;
+  color: #fff;
+  padding: 12px 28px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 1rem;
   margin-top: 10px;
+  align-self: flex-end;
+  transition: background 0.2s;
+}
+button[type="submit"]:hover {
+  background: #4f8cff;
 }
 
 #snippetsList,
 #searchResults {
-  background: white;
-  border-radius: 6px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  padding: 15px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(34, 34, 59, 0.08);
+  padding: 20px;
   white-space: pre-wrap;
-  font-family: monospace;
+  font-family: "Fira Mono", monospace;
   color: #222;
-  margin-bottom: 30px;
+  margin-bottom: 36px;
   max-height: 400px;
   overflow-y: auto;
 }
-
 .snippet-item {
-  border-bottom: 1px solid #ddd;
-  padding: 10px 0;
+  background: #af8888; /* White background for card effect */
+  border-radius: 10px; /* More rounded corners */
+  box-shadow: 0 2px 12px rgba(34, 34, 59, 0.1); /* Softer, larger shadow */
+  margin-bottom: 20px; /* Space between cards */
+  padding: 20px 24px; /* More padding for content */
+  border: 1px solid #e0e7ff; /* Subtle border */
+  transition: box-shadow 0.2s, border-color 0.2s;
+  position: relative;
+  overflow: auto;
 }
 
 .snippet-item:last-child {
-  border-bottom: none;
+  margin-bottom: 0; /* No extra space after last card */
+}
+
+.snippet-item pre {
+  background: #22223b;
+  color: #f8fafc;
+  padding: 14px;
+  border-radius: 6px;
+  font-family: "Fira Mono", monospace;
+  font-size: 1em;
+  overflow-x: auto;
+  margin: 10px 0 0 0;
+}
+
+.snippet-item pre code {
+  background: none;
+  color: inherit;
+  font-family: "Fira Mono", monospace;
+  font-size: 1em;
+  display: block;
+  white-space: pre;
+  padding: 0;
+  border: none;
 }
 
 .snippet-tags {
   font-style: italic;
-  color: #555;
+  color: #4f8cff;
   margin-bottom: 5px;
+  font-size: 0.95em;
+}
+
+.snippet-meta {
+  color: #888;
+  font-size: 0.92em;
+  margin-bottom: 6px;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  background: #f5f7fa;
+}
+::-webkit-scrollbar-thumb {
+  background: #e0e7ff;
+  border-radius: 4px;
 }

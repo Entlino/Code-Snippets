@@ -20,7 +20,6 @@
           id="codeInput"
           placeholder="Paste your code snippet here..."
         ></textarea>
-        <br />
         <button type="submit">Submit Snippet</button>
         <div id="responseMsg"></div>
       </form>
@@ -42,7 +41,7 @@
       const responseMsg = document.getElementById("responseMsg");
 
       const searchBtn = document.getElementById("searchBtn");
-      const searchInput = document.getElementById("searchInput");
+      const searchInput = document.querySelector('nav input[type="text"]');
       const searchResults = document.getElementById("searchResults");
       const searchResultsList = document.getElementById("searchResultsList");
 
@@ -69,18 +68,8 @@
           const result = await response.json();
 
           if (response.ok) {
-            responseMsg.innerHTML = `
-              Snippet saved with ID: ${result.id}<br>
-              Tags: ${
-                result.tags &&
-                Array.isArray(result.tags) &&
-                result.tags.length > 0
-                  ? result.tags.join(", ")
-                  : "(none)"
-              }<br>
-              Beschreibung: ${result.description || "(none)"}
-            `;
             codeInput.value = "";
+            responseMsg.textContent = ""; // Keine Rückmeldung anzeigen
           } else {
             responseMsg.textContent = `Error: ${
               result.error || "Unknown error"
@@ -115,9 +104,22 @@
           searchResultsList.innerHTML = "";
           snippets.forEach((snip) => {
             const snippetDiv = document.createElement("div");
-            snippetDiv.textContent = `ID: ${snip.id}\nTags: ${
-              snip.tags || "(none)"
-            }\nCode:\n${snip.code}`;
+            snippetDiv.className = "snippet-item";
+            snippetDiv.innerHTML = `
+  <div class="snippet-meta">ID: ${snip.id} ${
+              snip.tags
+                ? '| Tags: <span class="snippet-tags">' + snip.tags + "</span>"
+                : ""
+            }</div>
+  ${
+    snip.description
+      ? '<div class="snippet-meta">Description: ' + snip.description + "</div>"
+      : ""
+  }
+  <pre><code>${snip.code
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")}</code></pre>
+`;
             searchResultsList.appendChild(snippetDiv);
           });
         } catch (err) {
@@ -142,9 +144,11 @@
           allSnippetsList.innerHTML = "";
           snippets.forEach((snip) => {
             const snippetDiv = document.createElement("div");
-            snippetDiv.textContent = `ID: ${snip.id}\nTags: ${
-              snip.tags || "(none)"
-            }\nCode:\n${snip.code}`;
+            snippetDiv.textContent = `ID: ${snip.id}
+            Tags: ${snip.tags || "(none)"}
+            Beschreibung: ${snip.description || "(none)"}
+            Code:
+            ${snip.code}`;
             allSnippetsList.appendChild(snippetDiv);
           });
         } catch (err) {
@@ -152,6 +156,24 @@
           console.error(err);
         }
       });
+
+      document.querySelectorAll("textarea").forEach((textarea) => {
+        textarea.addEventListener("input", function () {
+          this.style.height = "auto";
+          this.style.height = Math.min(this.scrollHeight, 300) + "px";
+        });
+      });
+
+      const searchButton = document.querySelector("nav button");
+
+      if (searchInput && searchButton) {
+        searchInput.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            searchButton.click();
+          }
+        });
+      }
     </script>
   </body>
 </html>
