@@ -79,7 +79,7 @@ textarea {
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
   background: #f8fafc;
   margin: 0;
-  box-sizing: border-box; /* Diese Zeile hinzufügen */
+  box-sizing: border-box;
 }
 
 button[type="submit"] {
@@ -108,9 +108,6 @@ button[type="submit"]:hover {
   border-radius: 4px;
 }
 
-/* Fügen Sie diese CSS-Regeln zu Ihrer bestehenden CSS-Datei hinzu: */
-
-/* Einheitliche Breite für alle Container */
 #snippetsList,
 #searchResults {
   background: #fff;
@@ -118,14 +115,13 @@ button[type="submit"]:hover {
   box-shadow: 0 4px 24px rgba(34, 34, 59, 0.1);
   padding: 32px;
   margin: 48px auto 36px auto;
-  max-width: 600px; /* Gleiche Breite wie das Formular */
-  max-height: none; /* Entfernt die Höhenbeschränkung */
-  overflow-y: visible; /* Entfernt das Scrolling */
-  white-space: normal; /* Normaler Textumbruch */
-  font-family: "Inter", Arial, sans-serif; /* Gleiche Schriftart wie der Rest */
+  max-width: 600px;
+  max-height: none;
+  overflow-y: visible;
+  white-space: normal;
+  font-family: "Inter", Arial, sans-serif;
 }
 
-/* Verbesserte Snippet-Item Cards */
 .snippet-item {
   background: #fff;
   border-radius: 12px;
@@ -146,7 +142,6 @@ button[type="submit"]:hover {
   margin-bottom: 0;
 }
 
-/* Header-Bereich für Metadaten */
 .snippet-header {
   margin-bottom: 16px;
   padding-bottom: 12px;
@@ -174,7 +169,6 @@ button[type="submit"]:hover {
   margin-bottom: 8px;
 }
 
-/* Code-Container mit Copy-Button */
 .code-container {
   position: relative;
 }
@@ -202,7 +196,6 @@ button[type="submit"]:hover {
   border: none;
 }
 
-/* Copy-Button Styling */
 .copy-btn {
   position: absolute;
   top: 8px;
@@ -223,7 +216,6 @@ button[type="submit"]:hover {
   border-color: rgba(255, 255, 255, 0.3);
 }
 
-/* Überschriften in den Containern */
 #snippetsList h2,
 #searchResults h2 {
   margin-top: 0;

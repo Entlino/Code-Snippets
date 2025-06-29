@@ -69,7 +69,7 @@
 
           if (response.ok) {
             codeInput.value = "";
-            responseMsg.textContent = ""; // Keine Rückmeldung anzeigen
+            responseMsg.textContent = "";
           } else {
             responseMsg.textContent = `Error: ${
               result.error || "Unknown error"
@@ -80,8 +80,6 @@
           console.error(err);
         }
       });
-
-      // Ersetzen Sie die searchBtn Event Listener Funktion durch diese verbesserte Version:
 
       searchBtn.addEventListener("click", async () => {
         const q = searchInput.value.trim();
@@ -108,7 +106,6 @@
             const snippetDiv = document.createElement("div");
             snippetDiv.className = "snippet-item";
 
-            // Erstelle Copy-Button
             const copyBtn = document.createElement("button");
             copyBtn.className = "copy-btn";
             copyBtn.innerHTML = "📋 Copy";
@@ -128,7 +125,7 @@
           }
           ${
             snip.description
-              ? '<div class="snippet-description">Beschreibung: ' +
+              ? '<div class="snippet-description">Description: ' +
                 snip.description +
                 "</div>"
               : ""
@@ -140,8 +137,6 @@
             .replace(/>/g, "&gt;")}</code></pre>
         </div>
       `;
-
-            // Copy-Button hinzufügen
             const codeContainer = snippetDiv.querySelector(".code-container");
             codeContainer.appendChild(copyBtn);
 
@@ -171,7 +166,6 @@
             const snippetDiv = document.createElement("div");
             snippetDiv.className = "snippet-item";
 
-            // Erstelle Copy-Button
             const copyBtn = document.createElement("button");
             copyBtn.className = "copy-btn";
             copyBtn.innerHTML = "📋 Copy";
@@ -204,7 +198,6 @@
         </div>
       `;
 
-            // Copy-Button hinzufügen
             const codeContainer = snippetDiv.querySelector(".code-container");
             codeContainer.appendChild(copyBtn);
 

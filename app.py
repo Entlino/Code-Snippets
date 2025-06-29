@@ -47,7 +47,6 @@ def add_snippet():
     if not code:
         return jsonify({'error': 'Code snippet is required'}), 400
 
-    # AI-Analyse des Code-Snippets
     print("Analysiere Code-Snippet mit AI...")
     analysis_result = analyze_code_snippet(code)
     tags = analysis_result.get('tags', 'code,snippet')
@@ -100,7 +99,6 @@ def search_snippets():
 
     db = get_db()
     cursor = db.cursor()
-    # Search in code, tags, and description
     cursor.execute(
         "SELECT id, code, tags, description, created_at FROM snippets WHERE code LIKE ? OR tags LIKE ? OR description LIKE ? ORDER BY created_at DESC",
         (f'%{query}%', f'%{query}%', f'%{query}%')
@@ -156,13 +154,11 @@ def delete_snippet(snippet_id):
 def health_check():
     """Health check endpoint"""
     try:
-        # Test database connection
         db = get_db()
         cursor = db.cursor()
         cursor.execute("SELECT COUNT(*) FROM snippets")
         count = cursor.fetchone()[0]
-        
-        # Test AI module
+
         from ai_module import analyze_code_snippet
         test_result = analyze_code_snippet("print('test')")
         ai_available = bool(test_result.get('tags'))
@@ -187,12 +183,11 @@ if __name__ == '__main__':
     init_db()
     print("Starte Code Snippet Manager...")
     print("AI-Modul wird geladen...")
-    
-    # Test AI connection on startup
+
     try:
         test_result = analyze_code_snippet("print('hello')")
         if test_result.get('tags'):
-            print("✓ AI-Modul (DeepSeek-Coder) verfügbar")
+            print("✓ AI-Modul (CodeLlama) verfügbar")
         else:
             print("⚠ AI-Modul läuft im Fallback-Modus")
     except Exception as e:
